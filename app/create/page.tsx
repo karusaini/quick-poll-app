@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ Import Router
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,12 +12,13 @@ import {
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Plus, Send } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/utils/supabase";
 
 export default function CreatePoll() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState([""]);
   const [loading, setLoading] = useState(false);
+  const router = useRouter(); // ✅ Initialize Router
 
   const addOption = () => setOptions([...options, ""]);
 
@@ -34,7 +36,7 @@ export default function CreatePoll() {
 
     setLoading(true);
 
-    // Poll Create API Call
+    // ✅ Create Poll in Supabase
     const { data: poll, error: pollError } = await supabase
       .from("polls")
       .insert([{ question }])
@@ -47,7 +49,7 @@ export default function CreatePoll() {
       return;
     }
 
-    // Poll Options API Call
+    // ✅ Insert Poll Options
     const optionsData = options
       .filter((opt) => opt.trim() !== "")
       .map((opt) => ({
@@ -65,6 +67,9 @@ export default function CreatePoll() {
       alert("Poll Created Successfully!");
       setQuestion("");
       setOptions([""]);
+
+      // ✅ Redirect to Poll Page
+      router.push(`/poll/${poll.id}`);
     }
 
     setLoading(false);
